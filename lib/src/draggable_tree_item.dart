@@ -55,18 +55,21 @@ class DraggableTreeItem<T> extends StatefulWidget {
   /// The nesting level (0 for root items)
   final int level;
 
+  final int maxDepth;
 
   /// Callback when reorder occurs
-  final Function(TreeNode<T>, TreeNode<T>, DropPosition, bool) onReorder;
+  final Function(TreeNode<T>, TreeNode<T>, DropPosition) onReorder;
 
   /// Callback when node expansion state changes
   final VoidCallback onToggle;
 
   /// Builder for the item content
-  final Widget Function(BuildContext context, TreeNode<T> node, bool isExpanded) itemBuilder;
+  final Widget Function(BuildContext context, TreeNode<T> node, bool isExpanded)
+      itemBuilder;
 
   /// Builder for the drag feedback widget
-  final Widget Function(BuildContext context, TreeNode<T> node)? feedbackBuilder;
+  final Widget Function(BuildContext context, TreeNode<T> node)?
+      feedbackBuilder;
 
   /// Configuration for the tree item appearance
   final TreeItemConfig config;
@@ -78,6 +81,7 @@ class DraggableTreeItem<T> extends StatefulWidget {
     super.key,
     required this.node,
     required this.level,
+    this.maxDepth = 5,
     required this.onReorder,
     required this.onToggle,
     required this.itemBuilder,
@@ -123,12 +127,18 @@ class _DraggableTreeItemState<T> extends State<DraggableTreeItem<T>> {
     return DragTarget<TreeNode<T>>(
       onWillAcceptWithDetails: (details) {
         // Don't allow dropping on self and prevent circular dependencies
-        return details.data.id != widget.node.id && 
-               !_isDescendantOf(details.data, widget.node);
+        return details.data.id != widget.node.id &&
+            !_isDescendantOf(details.data, widget.node);
       },
       onAcceptWithDetails: (details) {
         if (_currentDropPosition != null) {
-          widget.onReorder(details.data, widget.node, _currentDropPosition!, true);
+          final prospectiveDepth = _calculateNewDepth(details.data, widget.node,
+              _currentDropPosition ?? DropPosition.inside);
+          if (prospectiveDepth > widget.maxDepth) {
+            return ;
+          }
+          widget.onReorder(
+              details.data, widget.node, _currentDropPosition!);
         }
         setState(() => _currentDropPosition = null);
       },
@@ -159,7 +169,8 @@ class _DraggableTreeItemState<T> extends State<DraggableTreeItem<T>> {
               Container(
                 height: widget.config.dropIndicatorThickness,
                 color: widget.config.dropIndicatorColor,
-                margin: EdgeInsets.only(left: widget.level * widget.config.indentPerLevel),
+                margin: EdgeInsets.only(
+                    left: widget.level * widget.config.indentPerLevel),
               ),
             LongPressDraggable<TreeNode<T>>(
               data: widget.node,
@@ -179,7 +190,8 @@ class _DraggableTreeItemState<T> extends State<DraggableTreeItem<T>> {
               Container(
                 height: widget.config.dropIndicatorThickness,
                 color: widget.config.dropIndicatorColor,
-                margin: EdgeInsets.only(left: widget.level * widget.config.indentPerLevel),
+                margin: EdgeInsets.only(
+                    left: widget.level * widget.config.indentPerLevel),
               ),
           ],
         );
@@ -246,5 +258,14 @@ class _DraggableTreeItemState<T> extends State<DraggableTreeItem<T>> {
       if (_isDescendantOf(child, descendant)) return true;
     }
     return false;
+  }
+
+  int _calculateNewDepth(TreeNode<T> nodeBeingDragged, TreeNode<T> targetNode,
+      DropPosition position) {
+    if (position == DropPosition.inside) {
+      return widget.level + 1; // inside means child of current node
+    } else {
+      return widget.level; // above or below stays at the same level
+    }
   }
 }

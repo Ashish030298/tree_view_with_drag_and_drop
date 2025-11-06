@@ -27,11 +27,15 @@ class TreeView<T> extends StatefulWidget {
   /// The root nodes of the tree
   final List<TreeNode<T>> nodes;
 
+  final int maxDepth;
+
   /// Builder for each tree item
-  final Widget Function(BuildContext context, TreeNode<T> node, bool isExpanded) itemBuilder;
+  final Widget Function(BuildContext context, TreeNode<T> node, bool isExpanded)
+      itemBuilder;
 
   /// Builder for the drag feedback widget (optional)
-  final Widget Function(BuildContext context, TreeNode<T> node)? feedbackBuilder;
+  final Widget Function(BuildContext context, TreeNode<T> node)?
+      feedbackBuilder;
 
   /// Configuration for tree item appearance
   final TreeItemConfig config;
@@ -40,7 +44,8 @@ class TreeView<T> extends StatefulWidget {
   final bool enableDragAndDrop;
 
   /// Callback when a node is reordered
-  final Function(TreeNode<T> draggedNode, TreeNode<T> targetNode, DropPosition position)? onReorder;
+  final Function(TreeNode<T> draggedNode, TreeNode<T> targetNode,
+      DropPosition position)? onReorder;
 
   /// Callback when a node's expansion state changes
   final Function(TreeNode<T> node, bool isExpanded)? onNodeExpanded;
@@ -54,6 +59,7 @@ class TreeView<T> extends StatefulWidget {
   const TreeView({
     super.key,
     required this.nodes,
+    this.maxDepth = 5,
     required this.itemBuilder,
     this.feedbackBuilder,
     this.config = const TreeItemConfig(),
@@ -96,13 +102,14 @@ class _TreeViewState<T> extends State<TreeView<T>> {
     super.dispose();
   }
 
-  void _onReorder(TreeNode<T> draggedNode, TreeNode<T> targetNode, DropPosition position, bool isValidInsert) {
+  void _onReorder(TreeNode<T> draggedNode, TreeNode<T> targetNode,
+      DropPosition position) {
     setState(() {
       // Remove the dragged node from its current position
       _removeNode(_treeData, draggedNode);
 
       // Insert the dragged node at the new position
-      _insertNode(_treeData, draggedNode, targetNode, position, isValidInsert);
+      _insertNode(_treeData, draggedNode, targetNode, position);
     });
 
     // Notify callback
@@ -121,13 +128,8 @@ class _TreeViewState<T> extends State<TreeView<T>> {
     }
   }
 
-  void _insertNode(
-    List<TreeNode<T>> nodes,
-    TreeNode<T> nodeToInsert,
-    TreeNode<T> targetNode,
-    DropPosition position,
-    bool isValidInsert
-  ) {
+  void _insertNode(List<TreeNode<T>> nodes, TreeNode<T> nodeToInsert,
+      TreeNode<T> targetNode, DropPosition position) {
     for (int i = 0; i < nodes.length; i++) {
       if (nodes[i].id == targetNode.id) {
         switch (position) {
@@ -144,7 +146,7 @@ class _TreeViewState<T> extends State<TreeView<T>> {
         }
       }
       if (nodes[i].hasChildren) {
-        _insertNode(nodes[i].children, nodeToInsert, targetNode, position, isValidInsert);
+        _insertNode(nodes[i].children, nodeToInsert, targetNode, position);
       }
     }
   }
@@ -162,6 +164,7 @@ class _TreeViewState<T> extends State<TreeView<T>> {
         return DraggableTreeItem<T>(
           node: node,
           level: 0,
+          maxDepth: widget.maxDepth,
           onReorder: _onReorder,
           onToggle: () => _onToggle(node),
           itemBuilder: widget.itemBuilder,
