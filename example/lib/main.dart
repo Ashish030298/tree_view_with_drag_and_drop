@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tree_view_with_drag_and_drop/flutter_tree_drag_drop.dart';
+import 'package:tree_view_with_drag_and_drop/tree_view_with_drag_and_drop.dart';
 
 void main() {
   runApp(const MyApp());

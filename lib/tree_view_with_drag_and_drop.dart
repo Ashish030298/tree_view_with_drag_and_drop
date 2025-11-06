@@ -48,7 +48,7 @@
 /// )
 /// ```
 
-export 'src/tree_node.dart';
-export 'src/tree_view.dart';
-export 'src/draggable_tree_item.dart';
-export 'src/drop_position.dart';
+export './src/tree_node.dart';
+export './src/tree_view.dart';
+export './src/draggable_tree_item.dart';
+export './src/drop_position.dart';
