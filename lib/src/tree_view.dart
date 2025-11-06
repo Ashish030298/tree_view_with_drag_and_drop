@@ -96,13 +96,13 @@ class _TreeViewState<T> extends State<TreeView<T>> {
     super.dispose();
   }
 
-  void _onReorder(TreeNode<T> draggedNode, TreeNode<T> targetNode, DropPosition position) {
+  void _onReorder(TreeNode<T> draggedNode, TreeNode<T> targetNode, DropPosition position, bool isValidInsert) {
     setState(() {
       // Remove the dragged node from its current position
       _removeNode(_treeData, draggedNode);
 
       // Insert the dragged node at the new position
-      _insertNode(_treeData, draggedNode, targetNode, position);
+      _insertNode(_treeData, draggedNode, targetNode, position, isValidInsert);
     });
 
     // Notify callback
@@ -126,6 +126,7 @@ class _TreeViewState<T> extends State<TreeView<T>> {
     TreeNode<T> nodeToInsert,
     TreeNode<T> targetNode,
     DropPosition position,
+    bool isValidInsert
   ) {
     for (int i = 0; i < nodes.length; i++) {
       if (nodes[i].id == targetNode.id) {
@@ -143,7 +144,7 @@ class _TreeViewState<T> extends State<TreeView<T>> {
         }
       }
       if (nodes[i].hasChildren) {
-        _insertNode(nodes[i].children, nodeToInsert, targetNode, position);
+        _insertNode(nodes[i].children, nodeToInsert, targetNode, position, isValidInsert);
       }
     }
   }

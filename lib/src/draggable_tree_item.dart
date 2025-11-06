@@ -55,8 +55,9 @@ class DraggableTreeItem<T> extends StatefulWidget {
   /// The nesting level (0 for root items)
   final int level;
 
+
   /// Callback when reorder occurs
-  final Function(TreeNode<T>, TreeNode<T>, DropPosition) onReorder;
+  final Function(TreeNode<T>, TreeNode<T>, DropPosition, bool) onReorder;
 
   /// Callback when node expansion state changes
   final VoidCallback onToggle;
@@ -127,7 +128,7 @@ class _DraggableTreeItemState<T> extends State<DraggableTreeItem<T>> {
       },
       onAcceptWithDetails: (details) {
         if (_currentDropPosition != null) {
-          widget.onReorder(details.data, widget.node, _currentDropPosition!);
+          widget.onReorder(details.data, widget.node, _currentDropPosition!, true);
         }
         setState(() => _currentDropPosition = null);
       },
