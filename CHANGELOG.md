@@ -1,3 +1,3 @@
 
-version 1.0.1
-Restriction insert items
+version 1.0.2
+update dynamic maxdepth
