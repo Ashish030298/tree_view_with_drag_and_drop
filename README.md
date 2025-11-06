@@ -21,7 +21,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  tree_view_with_drag_and_drop: ^1.0.0
+  tree_view_with_drag_and_drop: ^1.0.3
 ```
 
 Then run:

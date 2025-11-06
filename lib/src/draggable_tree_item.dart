@@ -126,17 +126,15 @@ class _DraggableTreeItemState<T> extends State<DraggableTreeItem<T>> {
   Widget _buildDraggableItem() {
     return DragTarget<TreeNode<T>>(
       onWillAcceptWithDetails: (details) {
-        // Don't allow dropping on self and prevent circular dependencies
+        final prospectiveDepth = _calculateNewDepth(details.data, widget.node,
+              _currentDropPosition ?? DropPosition.inside);
+        // Don't allow dropping on self and max depth
         return details.data.id != widget.node.id &&
-            !_isDescendantOf(details.data, widget.node);
+       prospectiveDepth <= widget.maxDepth;
+
       },
       onAcceptWithDetails: (details) {
         if (_currentDropPosition != null) {
-          final prospectiveDepth = _calculateNewDepth(details.data, widget.node,
-              _currentDropPosition ?? DropPosition.inside);
-          if (prospectiveDepth > widget.maxDepth) {
-            return ;
-          }
           widget.onReorder(
               details.data, widget.node, _currentDropPosition!);
         }

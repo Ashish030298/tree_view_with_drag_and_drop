@@ -1,6 +1,6 @@
 name: tree_view_with_drag_and_drop
 description: A customizable Flutter tree view widget with drag-and-drop support for reordering nodes. Supports generic data types and provides extensive customization options.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/ashish030298/tree_view_with_drag_and_drop
 repository: https://github.com/ashish030298/tree_view_with_drag_and_drop
 issue_tracker: https://github.com/ashish030298/tree_view_with_drag_and_drop/issues
